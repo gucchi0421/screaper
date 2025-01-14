@@ -1,4 +1,6 @@
 import dataclasses
+import os
+import sys
 
 import requests
 from bs4 import BeautifulSoup
@@ -16,7 +18,6 @@ class Post:
 class Scraping:
     def __init__(self, url: str) -> None:
         self.url = url
-
 
     def get_post_urls(
         self, *, link_selector: str, pagination_slug: str | None = None, max_page_num: int | None = None
@@ -76,7 +77,6 @@ class Scraping:
 
         return list(return_urls)
 
-
     def get_post(self, url: str, date_selector: str, title_selector: str, content_selector: str) -> Post:
         """
         記事詳細ページから記事の情報を取得するメソッドです。
@@ -90,19 +90,33 @@ class Scraping:
         Returns:
             Post: 取得した記事の情報を表すPostオブジェクトを返します。
         """
-        req = requests.get(url, timeout=60)
-        req.encoding = req.apparent_encoding
-        soup = BeautifulSoup(req.text, "html.parser")
+        try:
+            req = requests.get(url, timeout=60)
+            req.encoding = req.apparent_encoding
+            soup = BeautifulSoup(req.text, "html.parser")
 
-        date = soup.select_one(date_selector).text
-        title = soup.select_one(title_selector).text
-        content = soup.select_one(content_selector).decode_contents()
+            date = soup.select_one(date_selector).text
+            title = soup.select_one(title_selector).text
+            content = soup.select_one(content_selector).decode_contents()
+
+        except requests.RequestException as e:
+            print(f"Request failed: {e}")
+            return Post(date="", title="", content="")
 
         return Post(date=ism_date(date), title=title, content=content)
 
 
 if __name__ == "__main__":
-    sc = Scraping(url="http://video-clear.jp/blog")
+    """"
+    確認用。先頭の1記事だけコンソールにJSONで出力します。
+    docker compose run --rm app uv run ./src/scraping.py
+    """
+    url = os.getenv("TARGET_URL")
+    if url is None:
+        print("TARGET_URL is not set.")
+        sys.exit(1)
+
+    sc = Scraping(url=url)
     post_urls = sc.get_post_urls(link_selector=".textArea > h3 > a")
     if post_urls:
         post = sc.get_post(

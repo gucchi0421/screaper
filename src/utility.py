@@ -18,7 +18,14 @@ def to_json(data: list[T]) -> str:
     return json.dumps([dataclasses.asdict(item) for item in data], ensure_ascii=False, indent=2)
 
 
-def save_json(data: list[T], path: str = "example.json") -> None:
+def save_json(data: list[T], filename: str = "example") -> None:
     """データクラスのリストをJSONファイルに保存する"""
-    with Path(f"./data/{path}").open("w", encoding="utf-8") as f:
+    output_dir = Path("./data")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    if not filename.endswith(".json"):
+        filename += ".json"
+    file_path = output_dir / filename
+
+    with file_path.open("w", encoding="utf-8") as f:
         json.dump([dataclasses.asdict(item) for item in data], f, ensure_ascii=False, indent=2)
