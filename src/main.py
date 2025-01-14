@@ -1,4 +1,5 @@
 import os
+import sys
 
 from dotenv import load_dotenv
 
@@ -16,51 +17,47 @@ def main() -> None:
 
     url: str
     ・記事一覧ページのURL
-    ・例: https://example/blog
+    ・例: "https://example/blog"
 
     link_selector: str
     ・記事一覧ページから記事詳細ページのURLを取得するためのCSSセレクター
-    ・例: .post-title > a
+    ・例: ".post-title > a"
 
     pagination_slug: str | None
     ・オプション: 一覧ページが分割されている場合の下層のスラッグ
     ・デフォルト: None
-    ・例: https://example/blog/page/2 ← こちらの/page/が該当します。
+    ・例: "https://example/blog/page/2" ← こちらの/page/が該当します。
 
     max_page_num: int | None
     ・オプション: 一覧ページが分割されている場合の最大ページ番号
     ・デフォルト: None
-    ・例: https://example/blog/page/2 ← こちらの/2/などのページ番号が該当します。
+    ・例: "https://example/blog/page/2" ← こちらの/2/などのページ番号が該当します。
 
     date_selector: str
     ・記事詳細の日付を取得するためのCSSセレクター
-    ・例: .date
+    ・例: ".date"
 
     title_selector: str
     ・記事詳細のタイトルを取得するためのCSSセレクター
-    ・例: .content-title > h2
+    ・例: ".content-title > h2"
 
     content_selector: str
     ・記事詳細のコンテンツを取得するためのCSSセレクター
-    ・例: .content-body
+    ・例: ".content-body"
 
-    path: str
-    ・デフォルト: "example.json"
+    filename: str
+    ・デフォルト: "example"
     ・保存するJSONファイルのパス
     """
     url = os.getenv("TARGET_URL")
     if url is None:
         print("TARGET_URL is not set.")
-        exit(1)
+        sys.exit(1)
 
     print("Start scraping...")
 
     sc = Scraping(url=url)
-    post_urls = sc.get_post_urls(
-        link_selector=".textArea > h3 > a",
-        pagination_slug="page",
-        max_page_num=20
-    )
+    post_urls = sc.get_post_urls(link_selector=".textArea > h3 > a", pagination_slug="page", max_page_num=20)
 
     if not post_urls:
         print("No posts found.")
@@ -72,19 +69,16 @@ def main() -> None:
     for url in post_urls:
         print(f"Target: {url}")
         post = sc.get_post(
-            url=url,
-            date_selector=".date",
-            title_selector=".blogContent > h3 > a",
-            content_selector=".commentArea"
+            url=url, date_selector=".date", title_selector=".blogContent > h3 > a", content_selector=".commentArea"
         )
         posts.append(post)
 
     print(f"\nScraped {len(posts)} posts")
 
     if posts:
-        path = "posts.json"
-        save_json(data=posts, path=path)
-        print(f"\nSent {len(posts)} posts to JSON file: ./data/{path}")
+        filename = "posts"
+        save_json(data=posts, filename=filename)
+        print(f"\nSent {len(posts)} posts to JSON file: ./data/{filename}.json")
     else:
         print("No posts found.")
 

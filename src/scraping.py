@@ -1,5 +1,6 @@
 import dataclasses
 import os
+import sys
 
 import requests
 from bs4 import BeautifulSoup
@@ -18,12 +19,8 @@ class Scraping:
     def __init__(self, url: str) -> None:
         self.url = url
 
-
     def get_post_urls(
-        self, *,
-        link_selector: str,
-        pagination_slug: str | None = None,
-        max_page_num: int | None = None
+        self, *, link_selector: str, pagination_slug: str | None = None, max_page_num: int | None = None
     ) -> list[str]:
         """
         記事一覧ページから記事詳細ページのURLを取得するメソッドです。
@@ -80,14 +77,7 @@ class Scraping:
 
         return list(return_urls)
 
-
-    def get_post(
-        self,
-        url: str,
-        date_selector: str,
-        title_selector: str,
-        content_selector: str
-    ) -> Post:
+    def get_post(self, url: str, date_selector: str, title_selector: str, content_selector: str) -> Post:
         """
         記事詳細ページから記事の情報を取得するメソッドです。
 
@@ -117,10 +107,14 @@ class Scraping:
 
 
 if __name__ == "__main__":
+    """"
+    確認用。先頭の1記事だけコンソールにJSONで出力します。
+    docker compose run --rm app uv run ./src/scraping.py
+    """
     url = os.getenv("TARGET_URL")
     if url is None:
         print("TARGET_URL is not set.")
-        exit(1)
+        sys.exit(1)
 
     sc = Scraping(url=url)
     post_urls = sc.get_post_urls(link_selector=".textArea > h3 > a")
