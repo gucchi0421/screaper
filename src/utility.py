@@ -15,10 +15,21 @@ def ism_date(input_date: str) -> str:
 
 def to_json(data: list[T]) -> str:
     """データクラスのリストをJSON形式に変換する"""
-    return json.dumps([dataclasses.asdict(item) for item in data], ensure_ascii=False, indent=2)
+    return json.dumps(
+        [dataclasses.asdict(item) for item in data],
+        ensure_ascii=False, indent=2
+    )
 
 
 def save_json(data: list[T], path: str = "example.json") -> None:
     """データクラスのリストをJSONファイルに保存する"""
-    with Path(f"./data/{path}").open("w", encoding="utf-8") as f:
-        json.dump([dataclasses.asdict(item) for item in data], f, ensure_ascii=False, indent=2)
+    output_dir = Path("./data")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    file_path = output_dir / path
+    with file_path.open("w", encoding="utf-8") as f:
+        json.dump(
+            [dataclasses.asdict(item) for item in data],
+            f,
+            ensure_ascii=False, indent=2
+        )

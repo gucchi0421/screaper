@@ -1,26 +1,30 @@
 
 ## 使い方
 
-クローン後は`emv.sample`を複製して`.env`へリネームしてください。
-`.env`の中に`TARGET_URL="記事一覧ページURL"`を追加した後に、`./src/`の中のソースを編集してください。
+クローン後`emv.sample`を複製して`.env`へリネーム
+
+`.env`の中に`TARGET_URL="記事一覧ページURL"`を追加
+
+その後、`./src/`の中のソースを編集してください。
+
 ```sh
-# Dockerイメージのビルド
+# Dockerイメージのビルド(Linux)
 docker compose build --no-cache \
         --build-arg UID=$(id -u) \
         --build-arg GID=$(id -g) \
         --build-arg USERNAME=$(whoami)
 
-# 起動
-docker compose up -d
-
-# コンテナのshellに入る
-docker exec -it app sh
+# Dockerイメージのビルド(Windows)
+docker compose build --no-cache \
+        --build-arg UID=1000 \
+        --build-arg GID=1000 \
+        --build-arg USERNAME=$env:USERNAME
 
 # Pythonスクリプトの実行
-task docker:run
+docker compose run --rm app uv run ./src/main.py
 
-# 停止
-task docker:stop
+# Pythonスクリプトの実行
+# docker compose run --rm app uv run ./src/scraping.py
 ```
 
 以下メモ
