@@ -1,0 +1,62 @@
+version: "3"
+
+dotenv: [".env"]
+
+includes:
+  docker: ./Taskfile.docker.yaml
+
+vars:
+  _ENTRY_PATH: src/main.py
+  _DOCKER_DIR: "docker"
+  _DOCKER_APP: "app"
+  _DOCKERFILE: "{{._DOCKER_DIR}}/{{._DOCKER_APP}}/Dockerfile"
+  _DOCKER_DB_URL: "{{.DB_USER}}:{{.DB_PASS}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_NAME}}?sslmode=disable"
+
+tasks:
+  default:
+    desc: "タスク一覧"
+    cmds:
+      - task -l --sort none
+    silent: true
+
+  new:
+    desc: "仮想環境の作成と依存パッケージのインストール"
+    cmds:
+      - mkdir -p .venv
+      - chown -R 1000:1000 .venv
+      - uv venv -p python3.13 .venv
+      - uv sync
+      - |
+        bash -c "
+        source .venv/bin/activate
+        pre-commit install
+        "
+    silent: true
+
+  s:
+    desc: "依存パッケージのインストール"
+    cmds:
+      - uv sync
+      - |
+        bash -c "
+        source .venv/bin/activate
+        pre-commit install
+        "
+    silent: true
+
+  fmt:
+    desc: "pythonコードのフォーマットと自動修正"
+    cmds:
+      - uvx ruff check --fix
+      - uvx ruff format
+    silent: true
+
+  run:
+    desc: "pythonエントリポイントの実行"
+    env:
+      PY_ENV: dev
+    cmds:
+      - task fmt
+      - echo ""
+      - uv run {{ ._ENTRY_PATH }}
+    silent: true

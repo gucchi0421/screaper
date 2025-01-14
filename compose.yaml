@@ -1,0 +1,69 @@
+x-common: &common
+  tty: true
+  networks:
+    - app
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+        - USERNAME=${USER:-user}
+    volumes:
+      - ./:/app
+      - ./.env:/app/.env
+    ports:
+      - "${PORT:-8000}:${PORT:-8000}"
+    # depends_on:
+    #   db:
+    #     condition: service_started
+    env_file: .env
+    environment:
+      PY_ENV: ${PY_ENV:-dev}
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: "0.5"
+        reservations:
+          memory: 512m
+    stdin_open: true
+    <<: *common
+
+  # db:
+  #   container_name: ${SERVICENAME}_db
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_DB: ${DB_NAME}
+  #     POSTGRES_USER: ${DB_USER}
+  #     POSTGRES_PASSWORD: ${DB_PASS}
+  #     POSTGRES_HOST_AUTH_METHOD: trust
+  #     TZ: 'Asia/Tokyo'
+  #   ports:
+  #     - "${DB_PORT}:${DB_PORT}"
+  #   volumes:
+  #     - db_data:/var/lib/postgresql/data
+  #   <<: *common
+
+  # pga:
+  #   container_name: ${SERVICENAME}_pga
+  #   image: dpage/pgadmin4:latest
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGA_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGA_PASSWORD}
+  #   ports:
+  #     - "8081:80"
+  #   depends_on:
+  #     db:
+  #       condition: service_started
+  #   <<: *common
+
+networks:
+  app:
+    driver: bridge
+
+# volumes:
+#   db_data:

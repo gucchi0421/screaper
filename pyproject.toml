@@ -1,0 +1,66 @@
+[project]
+name = "screaper"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "numpy>=2.2.1",
+  "pandas>=2.2.3",
+  "requests>=2.32.3",
+  "python-dotenv>=1.0.1",
+  "beautifulsoup4>=4.12.3",
+  "typing>=3.10.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["T201", "COM812", "ISC001", "ERA001", "D"]
+unfixable = ["F401", "F841"]
+pydocstyle.convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["D", "S101", "N802", "ARG"]
+
+[tool.uv]
+dev-dependencies = [
+  "mypy>=1.14.1",
+  "pytest>=8.3.4",
+  "pytest-cov>=6.0.0",
+  "pytest-mock>=3.14.0",
+  "ruff>=0.8.5",
+  "types-requests>=2.32.0.20241016",
+  "pre-commit>=4.0.1",
+]
+
+[tool.ruff.lint.pylint]
+max-args = 6

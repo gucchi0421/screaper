@@ -1,0 +1,76 @@
+version: "3"
+
+tasks:
+  # ================================================
+  # Docker
+  # ================================================
+  build:
+    desc: "開発イメージビルド"
+    cmds:
+      - |
+        docker compose build --no-cache \
+        --build-arg UID=$(id -u) \
+        --build-arg GID=$(id -g) \
+        --build-arg USERNAME=$(whoami)
+    silent: true
+
+  run:
+    cmds:
+      - echo "Running..."
+      - echo ""
+      - docker compose run --rm app uv run {{ ._ENTRY_PATH }}
+    silent: true
+
+  up:
+    desc: "コンテナを起動 (Ctrl+Cで停止)"
+    cmds:
+      - |
+        bash -c 'trap \
+        "echo \"Gracefully stopping containers...\"; \
+        docker compose stop -t 30; \
+        exit 0" \
+        EXIT INT TERM; \
+        docker compose up \
+        & wait'
+    silent: true
+
+  up-d:
+    desc: "コンテナを起動 (Ctrl+Cで停止)"
+    cmds:
+      - |
+        bash -c 'trap \
+        "docker compose stop; exit 0" \
+        EXIT INT TERM; \
+        docker compose up -d && \
+        docker compose logs -f {{._DOCKER_APP}} \
+        & wait'
+    silent: true
+
+  stop:
+    desc: "コンテナを停止"
+    cmds:
+      - docker compose stop
+    silent: true
+
+  down:
+    desc: "コンテナを削除"
+    cmds:
+      - docker compose down
+    silent: true
+
+  log:
+    desc: "コンテナのログを表示"
+    cmds:
+      - docker compose logs -f
+    silent: true
+
+  ps:
+    desc: "コンテナの状態を表示"
+    cmds:
+      - docker compose ps
+    silent: true
+
+  user:
+    cmds:
+      - docker compose exec {{._DOCKER_APP}} whoami && id
+    silent: true
