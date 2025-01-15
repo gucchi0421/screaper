@@ -19,6 +19,17 @@ class Scraping:
     def __init__(self, url: str) -> None:
         self.url = url
 
+    def _set_soup(self, url: str) -> BeautifulSoup:
+        """HTMLパーサーの共通化"""
+        req = requests.get(url, timeout=60)
+        req.encoding = req.apparent_encoding
+        return BeautifulSoup(req.text, "html.parser")
+
+    def _get_href_elements(self, elements: list[BeautifulSoup]) -> list[str]:
+        return [
+            element.get("href") for element in elements if element.get("href") and isinstance(element.get("href"), str)
+        ]
+
     def get_post_urls(
         self, *, link_selector: str, pagination_slug: str | None = None, max_page_num: int | None = None
     ) -> list[str]:
@@ -37,15 +48,9 @@ class Scraping:
         return_urls = set()
 
         try:
-            req = requests.get(self.url, timeout=60)
-            req.encoding = req.apparent_encoding
-            soup = BeautifulSoup(req.text, "html.parser")
+            soup = self._set_soup(self.url)
             elements = soup.select(link_selector)
-            urls = [
-                element.get("href")
-                for element in elements
-                if element.get("href") and isinstance(element.get("href"), str)
-            ]
+            urls = self._get_href_elements(elements)
             return_urls.update(urls)
 
             if not pagination_slug or not max_page_num:
@@ -53,22 +58,13 @@ class Scraping:
 
             for i in range(2, max_page_num + 1):
                 url = f"{self.url.rstrip('/')}/{pagination_slug}/{i}"
-
-                req = requests.get(url, timeout=60)
-                req.encoding = req.apparent_encoding
-
-                soup = BeautifulSoup(req.text, "html.parser")
+                soup = self._set_soup(url)
                 elements = soup.select(link_selector)
-
                 if not elements:
                     print(f"No elements found on page {i}. Stopping.")
                     break
 
-                urls = [
-                    element.get("href")
-                    for element in elements
-                    if element.get("href") and isinstance(element.get("href"), str)
-                ]
+                urls = self._get_href_elements(elements)
                 return_urls.update(urls)
 
         except requests.RequestException as e:
@@ -77,7 +73,7 @@ class Scraping:
 
         return list(return_urls)
 
-    def get_post(self, url: str, date_selector: str, title_selector: str, content_selector: str) -> Post:
+    def get_post(self, *, url: str, date_selector: str, title_selector: str, content_selector: str) -> Post:
         """
         記事詳細ページから記事の情報を取得するメソッドです。
 
@@ -91,10 +87,7 @@ class Scraping:
             Post: 取得した記事の情報を表すPostオブジェクトを返します。
         """
         try:
-            req = requests.get(url, timeout=60)
-            req.encoding = req.apparent_encoding
-            soup = BeautifulSoup(req.text, "html.parser")
-
+            soup = self._set_soup(url)
             date = soup.select_one(date_selector).text
             title = soup.select_one(title_selector).text
             content = soup.select_one(content_selector).decode_contents()

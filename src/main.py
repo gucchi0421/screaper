@@ -15,39 +15,40 @@ def main() -> None:
     記事一覧ページから記事詳細ページのURLを取得し、記事詳細ページから記事の情報を取得します。
     デフォルトではJSON形式で保存、オプションで標準出力に出力できます。
 
-    url: str
-    ・記事一覧ページのURL
-    ・例: "https://example/blog"
+    Variables:
+        url(str):
+        ・記事一覧ページのURL
+        ・例: "https://example/blog"
 
-    link_selector: str
-    ・記事一覧ページから記事詳細ページのURLを取得するためのCSSセレクター
-    ・例: ".post-title > a"
+        link_selector(str):
+        ・記事一覧ページから記事詳細ページのURLを取得するためのCSSセレクター
+        ・例: ".post-title > a"
 
-    pagination_slug: str | None
-    ・オプション: 一覧ページが分割されている場合の下層のスラッグ
-    ・デフォルト: None
-    ・例: "https://example/blog/page/2" ← こちらの/page/が該当します。
+        pagination_slug(str|None):
+        ・オプション: 一覧ページが分割されている場合の下層のスラッグ
+        ・デフォルト: None
+        ・例: "https://example/blog/page/2" ← こちらの/page/が該当します。
 
-    max_page_num: int | None
-    ・オプション: 一覧ページが分割されている場合の最大ページ番号
-    ・デフォルト: None
-    ・例: "https://example/blog/page/2" ← こちらの/2/などのページ番号が該当します。
+        max_page_num(int|None):
+        ・オプション: 一覧ページが分割されている場合の最大ページ番号
+        ・デフォルト: None
+        ・例: "https://example/blog/page/2" ← こちらの/2/などのページ番号が該当します。
 
-    date_selector: str
-    ・記事詳細の日付を取得するためのCSSセレクター
-    ・例: ".date"
+        date_selector:(str) (str)
+        ・記事詳細の日付を取得するためのCSSセレクター
+        ・例: ".date"
 
-    title_selector: str
-    ・記事詳細のタイトルを取得するためのCSSセレクター
-    ・例: ".content-title > h2"
+        title_selector(str):
+        ・記事詳細のタイトルを取得するためのCSSセレクター
+        ・例: ".content-title > h2"
 
-    content_selector: str
-    ・記事詳細のコンテンツを取得するためのCSSセレクター
-    ・例: ".content-body"
+        content_selector(str):
+        ・記事詳細のコンテンツを取得するためのCSSセレクター
+        ・例: ".content-body"
 
-    filename: str
-    ・デフォルト: "example"
-    ・保存するJSONファイルのパス
+        filename(str):
+        ・デフォルト: "example"
+        ・保存するJSONファイルのパス
     """
     url = os.getenv("TARGET_URL")
     if url is None:
@@ -63,7 +64,7 @@ def main() -> None:
         print("No posts found.")
         return
 
-    print(f"Get {len(post_urls)} urls")
+    print(f"\nGet {len(post_urls)} urls\n")
 
     posts = []
     for url in post_urls:
