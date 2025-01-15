@@ -1,28 +1,31 @@
 
 ## 使い方
 
-クローン後は`emv.sample`を複製して`.env`へリネームしてください。
-`.env`の中に`TARGET_URL="記事一覧ページURL"`を追加した後に、`./src/`の中のソースを編集してください。
+クローン後`env.sample`を複製して`.env`へリネーム
+
+`.env`の中に`TARGET_URL="記事一覧ページURL"`を追加
+
+その後、`src`の中を編集してください。
+
 ```sh
-# Dockerイメージのビルド
+# Dockerイメージのビルド(Linux)
 docker compose build --no-cache \
         --build-arg UID=$(id -u) \
         --build-arg GID=$(id -g) \
         --build-arg USERNAME=$(whoami)
 
-# 起動
-docker compose up -d
-
-# コンテナのshellに入る
-docker exec -it app sh
+# Dockerイメージのビルド(Windows)
+docker compose build --no-cache \
+        --build-arg UID=1000 \
+        --build-arg GID=1000 \
+        --build-arg USERNAME=$env:USERNAME
 
 # Pythonスクリプトの実行
-task docker:run
+docker compose run --rm app uv run ./src/main.py
 
-# 停止
-task docker:stop
+# Pythonスクリプトの実行
+# docker compose run --rm app uv run ./src/scraping.py
 ```
-
 以下メモ
 ---
 
@@ -39,34 +42,9 @@ task -v
 > Task version: v3.39.0 (h1:Loe6ppP1x38Puv1M2wigp91bH/garCt0vLWkJsiTWNI=)
 ```
 
-## dockerでセットアップ
-```sh
-# Taskがインストール済みなら
-task docker:build
-task docker:sh
-
-# Taskが未インストールなら
-docker compose build --no-cache \
-        --build-arg UID=$(id -u) \
-        --build-arg GID=$(id -g) \
-        --build-arg USERNAME=$(whoami)
-
-docker compose up -d
-docker exec -it コンテナ名 sh
-```
-
 ## 仮想環境、実行
 ```sh
 task new                  # 仮想環境セットアップ
 source .venv/bin/activate # 仮想環境に入る
 task run                  # pythonスクリプトの実行
-```
-
-### メモ
-```sh
-# 仮想環境に入る
-source .venv/bin/activate
-
-# 仮想環境から抜ける
-deactivate
 ```

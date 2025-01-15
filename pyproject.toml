@@ -44,7 +44,7 @@ docstring-code-format = true
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["T201", "COM812", "ISC001", "ERA001", "D"]
+ignore = ["E501", "T201", "COM812", "ISC001", "ERA001", "D"]
 unfixable = ["F401", "F841"]
 pydocstyle.convention = "google"
 
