@@ -462,6 +462,7 @@ dependencies = [
     { name = "pandas" },
     { name = "python-dotenv" },
     { name = "requests" },
+    { name = "types-requests" },
     { name = "typing" },
 ]
 
@@ -483,6 +484,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
+    { name = "types-requests", specifier = ">=2.32.0.20241016" },
     { name = "typing", specifier = ">=3.10.0.0" },
 ]
 
